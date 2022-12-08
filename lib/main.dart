@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/widget/button_widget.dart';
+import 'package:flutter_application/widget/dropdown_widget.dart';
 import 'package:flutter_application/widget/input_widget.dart';
 import 'package:flutter_application/widget/result_widget.dart';
 
@@ -18,14 +19,34 @@ class _MyAppState extends State<MyApp> {
   double _inputUser = 0;
   double _kelvin = 0;
   double _reamur = 0;
+  double _result = 0;
+  String _newValue = "Kelvin";
+
+  var listItem = [
+    "Kelvin",
+    "Reamur",
+  ];
 
   TextEditingController inputController = TextEditingController();
+
+  List<String> convertionHistory = [];
 
   void hitungSuhu() {
     setState(() {
       _inputUser = double.parse(inputController.text);
-      _kelvin = _inputUser + 273;
-      _reamur = (4 / 5) * _inputUser;
+      if (_newValue == "Kelvin") {
+        _result = _inputUser + 273;
+      } else {
+        _result = (4 / 5) * _inputUser;
+      }
+      convertionHistory.add(
+          "Suhu $_inputUser Celcius setelah dikonversi menjadi $_result $_newValue");
+    });
+  }
+
+  void dropdownOnChanged(String? changeValue) {
+    setState(() {
+      _newValue = changeValue ?? 'Kelvin';
     });
   }
 
@@ -55,6 +76,14 @@ class _MyAppState extends State<MyApp> {
               const SizedBox(
                 height: 16,
               ),
+              DropdownWidget(
+                dropdownOnChanged: dropdownOnChanged,
+                listItem: listItem,
+                newValue: _newValue,
+              ),
+              const SizedBox(
+                height: 16,
+              ),
               ButtonWidget(
                 onPressed: hitungSuhu,
                 title: 'Konversi',
@@ -63,9 +92,27 @@ class _MyAppState extends State<MyApp> {
                 height: 16,
               ),
               ResultWidget(
-                kelvin: _kelvin,
-                reamur: _reamur,
-              )
+                result: _result,
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              const Text(
+                "Riwayat Konversi",
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: convertionHistory.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(convertionHistory[index]),
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ),
